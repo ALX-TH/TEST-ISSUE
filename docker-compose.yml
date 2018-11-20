@@ -1,0 +1,68 @@
+version: "2"
+
+services:
+      # PHP апстримы
+
+      # Mater 1_1
+      php-master-1:
+        build: app/docker/php
+        container_name: fpm_master_1
+        working_dir: /usr/app
+        volumes:
+          - ./:/usr/app
+          - ./issues/3/php:/usr/app/web
+        ports:
+          - 9010:9000
+
+      # Slave 1_1
+      php-slave-1:
+        build: app/docker/php
+        container_name: fpm_slave_1
+        working_dir: /usr/app
+        volumes:
+          - ./:/usr/app
+          - ./issues/3/php:/usr/app/web
+        ports:
+          - 9011:9000
+
+      # Slave 1_2
+      php-slave-2:
+        build: app/docker/php
+        container_name: fpm_slave_2
+        working_dir: /usr/app
+        volumes:
+          - ./:/usr/app
+          - ./issues/3/php:/usr/app/web
+        ports:
+          - 9012:9000
+
+      # Web
+      nginx:
+        image: nginx
+        container_name: nginx_fpm
+        working_dir: /usr/app 
+        volumes:
+          - ./:/usr/app
+          - ./issues/3/conf:/etc/nginx/conf.d
+        ports:
+          - 80:80
+        volumes_from:
+          - php-master-1
+          - php-slave-1
+          - php-slave-2
+
+      # База данных
+      mysql:
+        image: mariadb:10.2
+        container_name: mysql
+        working_dir: /usr/app
+        volumes:
+          - ./:/usr/app
+          - ./app/docker/mysql:/etc/mysql/conf.d
+          - ./app/docker/databases.sql:/docker-entrypoint-initdb.d/db.sql
+        environment:
+          - MYSQL_ROOT_PASSWORD=mysqlpass
+          - MYSQL_USER=mysqluser
+          - MYSQL_PASSWORD=mysqlpass
+        ports:
+          - 9013:3306

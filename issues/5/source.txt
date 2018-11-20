@@ -1,0 +1,5 @@
+word1 12 word11
+w0rd2 34 woord22
+wo7d3 56 wo-rd3
+w07d4 78 wurd44
+w07d5 90 wurd5
